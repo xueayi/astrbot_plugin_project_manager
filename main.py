@@ -12,19 +12,19 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from core.config import ConfigManager
-from core.lark_bridge import LarkBridge
-from core.storage import MessageStore
-from listener.collector import MessageCollector
-from llm.doc_updater import DocUpdater
-from llm.report_generator import ReportGenerator
-from llm.summarizer import Summarizer
-from recorder.recorder import Recorder
-from reporter.reporter import Reporter
-
 from astrbot.api import star
 from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.core.utils.astrbot_path import get_astrbot_data_path
+
+from .core.config import ConfigManager
+from .core.lark_bridge import LarkBridge
+from .core.storage import MessageStore
+from .listener.collector import MessageCollector
+from .llm.doc_updater import DocUpdater
+from .llm.report_generator import ReportGenerator
+from .llm.summarizer import Summarizer
+from .recorder.recorder import Recorder
+from .reporter.reporter import Reporter
 
 logger = logging.getLogger(__name__)
 
@@ -280,6 +280,6 @@ class Main(star.Star):
     # ---- web API registration ----
 
     def _register_web_apis(self) -> None:
-        from web_api import register_all_apis
+        from .web_api import register_all_apis
 
         register_all_apis(self.context, self)

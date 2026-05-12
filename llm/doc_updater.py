@@ -10,10 +10,10 @@ from typing import TYPE_CHECKING
 from .prompts import DOC_UPDATE_SYSTEM, DOC_UPDATE_USER
 
 if TYPE_CHECKING:
-    from core.config import ConfigManager, ProjectConfig
-    from core.lark_bridge import LarkBridge
-
     from astrbot.api.star import Context
+
+    from ..core.config import ConfigManager, ProjectConfig
+    from ..core.lark_bridge import LarkBridge
 
 logger = logging.getLogger(__name__)
 

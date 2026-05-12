@@ -10,12 +10,12 @@ import astrbot.api.message_components as Comp
 from astrbot.api.event import MessageChain
 
 if TYPE_CHECKING:
-    from core.config import ConfigManager, ProjectConfig
-    from core.lark_bridge import LarkBridge
-    from core.storage import MessageStore
-    from llm.report_generator import ReportGenerator
-
     from astrbot.api.star import Context
+
+    from ..core.config import ConfigManager, ProjectConfig
+    from ..core.lark_bridge import LarkBridge
+    from ..core.storage import MessageStore
+    from ..llm.report_generator import ReportGenerator
 
 logger = logging.getLogger(__name__)
 

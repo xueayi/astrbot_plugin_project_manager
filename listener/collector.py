@@ -6,10 +6,10 @@ import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.config import ConfigManager
-    from core.storage import MessageStore
-
     from astrbot.core.platform import AstrMessageEvent
+
+    from ..core.config import ConfigManager
+    from ..core.storage import MessageStore
 
 logger = logging.getLogger(__name__)
 

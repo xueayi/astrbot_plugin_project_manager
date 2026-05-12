@@ -7,13 +7,13 @@ import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.config import ConfigManager, ProjectConfig
-    from core.lark_bridge import LarkBridge
-    from core.storage import MessageStore
-    from llm.doc_updater import DocUpdater
-    from llm.summarizer import Summarizer
-
     from astrbot.api.star import Context
+
+    from ..core.config import ConfigManager, ProjectConfig
+    from ..core.lark_bridge import LarkBridge
+    from ..core.storage import MessageStore
+    from ..llm.doc_updater import DocUpdater
+    from ..llm.summarizer import Summarizer
 
 logger = logging.getLogger(__name__)
 

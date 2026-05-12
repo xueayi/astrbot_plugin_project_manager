@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING
 from .prompts import SUMMARY_SYSTEM, SUMMARY_USER
 
 if TYPE_CHECKING:
-    from core.config import ConfigManager, ProjectConfig
-
     from astrbot.api.star import Context
+
+    from ..core.config import ConfigManager, ProjectConfig
 
 logger = logging.getLogger(__name__)
 

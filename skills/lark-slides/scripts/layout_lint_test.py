@@ -45,7 +45,9 @@ class LayoutLintTest(unittest.TestCase):
         self.assertIn("attribute", issue["hint"])
         self.assertIn("a=1&amp;b=2", issue["hint"])
 
-    def test_lint_xml_accepts_escaped_entities_without_suspicious_entity_warning(self) -> None:
+    def test_lint_xml_accepts_escaped_entities_without_suspicious_entity_warning(
+        self,
+    ) -> None:
         result = layout_lint.lint_xml(
             """
             <slide xmlns="http://www.larkoffice.com/sml/2.0">
@@ -111,7 +113,9 @@ class LayoutLintTest(unittest.TestCase):
         self.assertEqual(result["summary"]["error_count"], 1)
         self.assertEqual(result["slides"][0]["issues"][0]["code"], "bbox_overlap")
 
-    def test_lint_xml_detects_out_of_bounds_elements_and_text_height_risks(self) -> None:
+    def test_lint_xml_detects_out_of_bounds_elements_and_text_height_risks(
+        self,
+    ) -> None:
         result = layout_lint.lint_xml(
             """
             <presentation xmlns="http://www.larkoffice.com/sml/2.0" width="960" height="540">
@@ -130,8 +134,18 @@ class LayoutLintTest(unittest.TestCase):
         )
         self.assertEqual(result["summary"]["error_count"], 1)
         self.assertEqual(result["summary"]["warning_count"], 1)
-        self.assertTrue(any(issue["code"] == "out_of_bounds" for issue in result["slides"][0]["issues"]))
-        self.assertTrue(any(issue["code"] == "text_height_risk" for issue in result["slides"][0]["issues"]))
+        self.assertTrue(
+            any(
+                issue["code"] == "out_of_bounds"
+                for issue in result["slides"][0]["issues"]
+            )
+        )
+        self.assertTrue(
+            any(
+                issue["code"] == "text_height_risk"
+                for issue in result["slides"][0]["issues"]
+            )
+        )
 
     def test_lint_xml_allows_template_style_bleed_and_text_over_images(self) -> None:
         result = layout_lint.lint_xml(

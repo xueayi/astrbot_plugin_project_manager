@@ -12,7 +12,8 @@ from quart import jsonify, request
 
 if TYPE_CHECKING:
     from astrbot.api.star import Context
-    from main import Main
+
+    from .main import Main
 
 logger = logging.getLogger(__name__)
 

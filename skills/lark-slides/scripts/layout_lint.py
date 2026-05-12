@@ -43,7 +43,7 @@ def parse_args(argv: list[str]) -> dict[str, Any]:
 
 
 def extract_attribute(tag_source: str, name: str) -> str | None:
-    match = re.search(fr'{re.escape(name)}="([^"]+)"', tag_source)
+    match = re.search(rf'{re.escape(name)}="([^"]+)"', tag_source)
     return match.group(1) if match else None
 
 
@@ -74,7 +74,9 @@ def xml_local_name(tag: str) -> str:
     return tag.rsplit("}", 1)[-1] if tag.startswith("{") else tag
 
 
-def extract_error_context(xml: str, line: int | None, column: int | None, radius: int = 40) -> str | None:
+def extract_error_context(
+    xml: str, line: int | None, column: int | None, radius: int = 40
+) -> str | None:
     if line is None or column is None:
         return None
     lines = xml.splitlines()
@@ -118,8 +120,12 @@ def parse_presentation(xml: str) -> dict[str, Any]:
     presentation_match = re.search(r"<presentation\b([^>]*)>", xml)
     if presentation_match:
         return {
-            "width": int(float(extract_attribute(presentation_match.group(1), "width") or 960)),
-            "height": int(float(extract_attribute(presentation_match.group(1), "height") or 540)),
+            "width": int(
+                float(extract_attribute(presentation_match.group(1), "width") or 960)
+            ),
+            "height": int(
+                float(extract_attribute(presentation_match.group(1), "height") or 540)
+            ),
             "slides": re.findall(r"<slide\b[\s\S]*?</slide>", xml),
         }
     slide_match = re.findall(r"<slide\b[\s\S]*?</slide>", xml)
@@ -137,7 +143,11 @@ def extract_elements(slide_xml: str) -> list[dict[str, Any]]:
         width = extract_numeric_attribute(attrs, "width")
         height = extract_numeric_attribute(attrs, "height")
         if all(value is not None for value in [x, y, width, height]):
-            font_size = float(extract_attribute(content, "fontSize") or extract_attribute(attrs, "fontSize") or 16)
+            font_size = float(
+                extract_attribute(content, "fontSize")
+                or extract_attribute(attrs, "fontSize")
+                or 16
+            )
             elements.append(
                 {
                     "id": f"shape-{len(elements) + 1}",
@@ -198,25 +208,33 @@ def is_backgroundish(element: dict[str, Any], slide_area: int | float) -> bool:
     return False
 
 
-def should_flag_overlap(left: dict[str, Any], right: dict[str, Any], slide_area: int | float) -> bool:
+def should_flag_overlap(
+    left: dict[str, Any], right: dict[str, Any], slide_area: int | float
+) -> bool:
     if is_backgroundish(left, slide_area) or is_backgroundish(right, slide_area):
         return False
     if is_text_element(left) and is_text_element(right):
         return True
     allowed_companions = {"img", "table", "chart"}
-    return (
-        is_text_element(left) and right["kind"] in allowed_companions
-    ) or (
+    return (is_text_element(left) and right["kind"] in allowed_companions) or (
         is_text_element(right) and left["kind"] in allowed_companions
     )
 
 
 def estimate_text_height(element: dict[str, Any]) -> int | None:
-    if element["kind"] != "shape" or element["type"] != "text" or not element.get("text"):
+    if (
+        element["kind"] != "shape"
+        or element["type"] != "text"
+        or not element.get("text")
+    ):
         return None
-    font_size = element["fontSize"] if isinstance(element["fontSize"], (int, float)) else 16
+    font_size = (
+        element["fontSize"] if isinstance(element["fontSize"], (int, float)) else 16
+    )
     chars_per_line = max(1, int(element["width"] // max(font_size * 0.55, 1)))
-    paragraphs = [paragraph for paragraph in re.split(r"\n+", element["text"]) if paragraph]
+    paragraphs = [
+        paragraph for paragraph in re.split(r"\n+", element["text"]) if paragraph
+    ]
     line_count = 0
     for paragraph in paragraphs:
         logical_length = max(len(paragraph), 1)
@@ -224,7 +242,9 @@ def estimate_text_height(element: dict[str, Any]) -> int | None:
     return int((line_count * font_size * 1.35) + 12 + 0.999999)
 
 
-def lint_slide(slide_xml: str, slide_number: int, width: int, height: int) -> dict[str, Any]:
+def lint_slide(
+    slide_xml: str, slide_number: int, width: int, height: int
+) -> dict[str, Any]:
     elements = extract_elements(slide_xml)
     issues: list[dict[str, Any]] = []
     slide_area = width * height
@@ -241,7 +261,7 @@ def lint_slide(slide_xml: str, slide_number: int, width: int, height: int) -> di
                     "level": "error",
                     "code": "out_of_bounds",
                     "element": element["id"],
-                    "message": f'{element["id"]} exceeds slide bounds',
+                    "message": f"{element['id']} exceeds slide bounds",
                 }
             )
         estimated_height = estimate_text_height(element)
@@ -251,20 +271,22 @@ def lint_slide(slide_xml: str, slide_number: int, width: int, height: int) -> di
                     "level": "warning",
                     "code": "text_height_risk",
                     "element": element["id"],
-                    "message": f'{element["id"]} may need {estimated_height}px height but only has {element["height"]}px',
+                    "message": f"{element['id']} may need {estimated_height}px height but only has {element['height']}px",
                 }
             )
 
     for index, left in enumerate(elements):
         for right in elements[index + 1 :]:
-            if not intersects(left, right) or not should_flag_overlap(left, right, slide_area):
+            if not intersects(left, right) or not should_flag_overlap(
+                left, right, slide_area
+            ):
                 continue
             issues.append(
                 {
                     "level": "error",
                     "code": "bbox_overlap",
                     "elements": [left["id"], right["id"]],
-                    "message": f'{left["id"]} overlaps {right["id"]}',
+                    "message": f"{left['id']} overlaps {right['id']}",
                 }
             )
 
@@ -289,11 +311,15 @@ def lint_slide(slide_xml: str, slide_number: int, width: int, height: int) -> di
                     "level": "warning",
                     "code": "footer_collision",
                     "elements": [footer["id"], element["id"]],
-                    "message": f'{footer["id"]} is being crowded by {element["id"]}',
+                    "message": f"{footer['id']} is being crowded by {element['id']}",
                 }
             )
 
-    return {"slide_number": slide_number, "element_count": len(elements), "issues": issues}
+    return {
+        "slide_number": slide_number,
+        "element_count": len(elements),
+        "issues": issues,
+    }
 
 
 def lint_xml(xml: str, source_path: str | None = None) -> dict[str, Any]:
@@ -312,18 +338,34 @@ def lint_xml(xml: str, source_path: str | None = None) -> dict[str, Any]:
         lint_slide(slide_xml, index + 1, presentation["width"], presentation["height"])
         for index, slide_xml in enumerate(presentation["slides"])
     ]
-    error_count = sum(1 for slide in slides for issue in slide["issues"] if issue["level"] == "error")
-    warning_count = sum(1 for slide in slides for issue in slide["issues"] if issue["level"] == "warning")
+    error_count = sum(
+        1 for slide in slides for issue in slide["issues"] if issue["level"] == "error"
+    )
+    warning_count = sum(
+        1
+        for slide in slides
+        for issue in slide["issues"]
+        if issue["level"] == "warning"
+    )
     return {
         "file": source_path,
-        "slide_size": {"width": presentation["width"], "height": presentation["height"]},
-        "summary": {"slide_count": len(slides), "error_count": error_count, "warning_count": warning_count},
+        "slide_size": {
+            "width": presentation["width"],
+            "height": presentation["height"],
+        },
+        "summary": {
+            "slide_count": len(slides),
+            "error_count": error_count,
+            "warning_count": warning_count,
+        },
         "slides": slides,
     }
 
 
 def print_usage() -> None:
-    print("Usage:\n  python3 layout_lint.py --input <presentation.xml>", file=sys.stderr)
+    print(
+        "Usage:\n  python3 layout_lint.py --input <presentation.xml>", file=sys.stderr
+    )
 
 
 def run_cli(argv: list[str] | None = None) -> None:

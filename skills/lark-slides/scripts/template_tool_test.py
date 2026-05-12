@@ -16,7 +16,9 @@ class TemplateToolTest(unittest.TestCase):
 
     def test_build_index_data_exposes_light_general_metadata(self) -> None:
         template = next(
-            entry for entry in self.index_data["templates"] if entry["template_id"] == "office--light_general"
+            entry
+            for entry in self.index_data["templates"]
+            if entry["template_id"] == "office--light_general"
         )
         expected_keys = {
             "template_id",
@@ -46,9 +48,13 @@ class TemplateToolTest(unittest.TestCase):
         self.assertNotIn("bbox_summary", template)
 
     def test_search_templates_keeps_work_report_templates_in_top_results(self) -> None:
-        results = template_tool.search_templates(self.index_data, {"query": "工作汇报", "limit": 3})
+        results = template_tool.search_templates(
+            self.index_data, {"query": "工作汇报", "limit": 3}
+        )
         self.assertTrue(results)
-        self.assertTrue(any(entry["template_id"] == "office--work_report" for entry in results))
+        self.assertTrue(
+            any(entry["template_id"] == "office--work_report" for entry in results)
+        )
 
     def test_search_templates_extracts_scene_from_long_chinese_prompt(self) -> None:
         results = template_tool.search_templates(
@@ -56,7 +62,9 @@ class TemplateToolTest(unittest.TestCase):
             {"query": "帮我做一个季度工作汇报PPT，偏正式", "limit": 3},
         )
         self.assertTrue(results)
-        self.assertTrue(any(entry["template_id"] == "office--work_report" for entry in results))
+        self.assertTrue(
+            any(entry["template_id"] == "office--work_report" for entry in results)
+        )
 
     def test_search_templates_maps_chinese_tone_words(self) -> None:
         results = template_tool.search_templates(
@@ -75,7 +83,11 @@ class TemplateToolTest(unittest.TestCase):
         self.assertTrue(
             any(
                 entry["template_id"]
-                in {"office--project_kickoff", "product--product_intro", "product--product_promotion"}
+                in {
+                    "office--project_kickoff",
+                    "product--product_intro",
+                    "product--product_promotion",
+                }
                 for entry in product_results
             )
         )
@@ -85,16 +97,25 @@ class TemplateToolTest(unittest.TestCase):
             {"query": "晋升答辩 个人述职", "limit": 5},
         )
         self.assertTrue(defense_results)
-        self.assertTrue(any(entry["template_id"] == "personal--promotion_defense" for entry in defense_results))
+        self.assertTrue(
+            any(
+                entry["template_id"] == "personal--promotion_defense"
+                for entry in defense_results
+            )
+        )
 
     def test_extract_selection_xml_keeps_only_requested_slides_and_theme(self) -> None:
-        xml = template_tool.extract_selection_xml(self.index_data, "office--light_general", {"label": "封面"})
+        xml = template_tool.extract_selection_xml(
+            self.index_data, "office--light_general", {"label": "封面"}
+        )
         self.assertEqual(len(template_tool.re.findall(r"<slide\b", xml)), 2)
         self.assertIn("<theme>", xml)
         self.assertIn("<title>白底通用模板</title>", xml)
 
     def test_summarize_selection_aggregates_slide_titles_and_counts(self) -> None:
-        summary = template_tool.summarize_selection(self.index_data, "office--light_general", {"label": "封面"})
+        summary = template_tool.summarize_selection(
+            self.index_data, "office--light_general", {"label": "封面"}
+        )
         self.assertEqual(summary["selection"]["range"], "1-2")
         self.assertEqual(summary["summary"]["slide_count"], 2)
         self.assertTrue(summary["theme_summary"]["has_theme_node"])
@@ -159,17 +180,25 @@ class TemplateToolTest(unittest.TestCase):
         )
 
     def test_all_template_files_are_cataloged_and_indexed(self) -> None:
-        template_files = sorted(path.stem for path in template_tool.TEMPLATES_DIR.glob("*.xml"))
-        indexed_templates = sorted(entry["template_id"] for entry in self.index_data["templates"])
+        template_files = sorted(
+            path.stem for path in template_tool.TEMPLATES_DIR.glob("*.xml")
+        )
+        indexed_templates = sorted(
+            entry["template_id"] for entry in self.index_data["templates"]
+        )
         self.assertEqual(indexed_templates, template_files)
         self.assertEqual(self.index_data["template_count"], len(template_files))
         self.assertTrue(template_files)
 
     def test_catalog_range_parser_keeps_comma_separated_ranges(self) -> None:
         template = next(
-            entry for entry in self.index_data["templates"] if entry["template_id"] == "operations--product_promotion"
+            entry
+            for entry in self.index_data["templates"]
+            if entry["template_id"] == "operations--product_promotion"
         )
-        content_range = next(item for item in template["ranges"] if item["label"] == "内容")
+        content_range = next(
+            item for item in template["ranges"] if item["label"] == "内容"
+        )
         self.assertEqual(content_range["range"], "3-8, 10-12")
 
 
