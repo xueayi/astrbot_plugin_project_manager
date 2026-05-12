@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>项目管理</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="app">
+    <nav id="nav">
+      <button class="nav-btn active" data-tab="projects">项目管理</button>
+      <button class="nav-btn" data-tab="settings">全局设置</button>
+    </nav>
+
+    <!-- Projects Tab -->
+    <section id="tab-projects" class="tab-content active">
+      <div class="toolbar">
+        <h2>项目列表</h2>
+        <button id="btn-add-project" class="btn btn-primary">+ 新建项目</button>
+      </div>
+      <div id="project-list" class="card-grid"></div>
+    </section>
+
+    <!-- Settings Tab -->
+    <section id="tab-settings" class="tab-content">
+      <h2>全局设置</h2>
+      <form id="settings-form" class="form-card">
+        <div class="form-group">
+          <label for="llm-provider">LLM 模型</label>
+          <select id="llm-provider"></select>
+        </div>
+        <div class="form-group">
+          <label for="lark-cli-path">lark-cli 路径</label>
+          <input type="text" id="lark-cli-path" placeholder="lark-cli" />
+        </div>
+        <div class="form-group">
+          <label for="retention-days">消息保留天数</label>
+          <input type="number" id="retention-days" min="1" max="365" value="7" />
+        </div>
+        <div id="lark-status" class="status-badge"></div>
+        <button type="submit" class="btn btn-primary">保存设置</button>
+      </form>
+    </section>
+
+    <!-- Project Edit Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title">编辑项目</h3>
+          <button id="btn-close-modal" class="btn-icon">&times;</button>
+        </div>
+        <form id="project-form" class="modal-body">
+          <input type="hidden" id="pf-id" />
+          <div class="form-group">
+            <label for="pf-name">项目名称</label>
+            <input type="text" id="pf-name" required />
+          </div>
+          <div class="form-group">
+            <label for="pf-handbook">管理手册 URL</label>
+            <input type="url" id="pf-handbook" placeholder="https://xxx.feishu.cn/docx/..." />
+          </div>
+          <div class="form-group">
+            <label for="pf-bulletin">公告板 URL</label>
+            <input type="url" id="pf-bulletin" placeholder="https://xxx.feishu.cn/docx/..." />
+          </div>
+          <div class="form-group">
+            <label for="pf-groups">QQ 群号 <small>(每行一个)</small></label>
+            <textarea id="pf-groups" rows="3" placeholder="123456789"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="pf-admins">管理员 QQ <small>(每行一个)</small></label>
+            <textarea id="pf-admins" rows="2" placeholder="111222333"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="pf-filtered">过滤成员 QQ <small>(每行一个，如机器人)</small></label>
+            <textarea id="pf-filtered" rows="2" placeholder="bot_qq_id"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="pf-mapping">人员映射 <small>(每行: 飞书名=QQ号)</small></label>
+            <textarea id="pf-mapping" rows="3" placeholder="张三=444555666"></textarea>
+          </div>
+          <fieldset class="form-fieldset">
+            <legend>定时任务</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pf-summary-cron">摘要 Cron</label>
+                <input type="text" id="pf-summary-cron" value="0 18 * * *" />
+              </div>
+              <div class="form-group">
+                <label for="pf-report-cron">报告 Cron</label>
+                <input type="text" id="pf-report-cron" value="0 9 * * *" />
+              </div>
+              <div class="form-group">
+                <label for="pf-urge-days">催促临期天数</label>
+                <input type="number" id="pf-urge-days" min="1" value="3" />
+              </div>
+            </div>
+          </fieldset>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="pf-enabled" checked /> 启用项目
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button type="button" id="btn-delete-project" class="btn btn-danger hidden">删除项目</button>
+            <button type="submit" class="btn btn-primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

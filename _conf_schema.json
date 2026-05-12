@@ -1,0 +1,20 @@
+{
+  "llm_provider_id": {
+    "description": "LLM Provider ID",
+    "type": "string",
+    "hint": "Select the LLM provider configured in AstrBot for summarization and report generation.",
+    "default": ""
+  },
+  "lark_cli_path": {
+    "description": "lark-cli Path",
+    "type": "string",
+    "hint": "Path to the lark-cli executable. Leave as default if lark-cli is in system PATH.",
+    "default": "lark-cli"
+  },
+  "message_retention_days": {
+    "description": "Message Retention (days)",
+    "type": "int",
+    "hint": "Number of days to keep processed raw messages before cleanup.",
+    "default": 7
+  }
+}
